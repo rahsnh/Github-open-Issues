@@ -1,7 +1,7 @@
 # Github-open-Issues
 A tool to display the count of Open Github Issues in a repository
 
-Live On: http://13.233.163.50/
+Live On: https://radius-agent.herokuapp.com/
 
 Input Example: https://github.com/hungtraan/FacebookBot
 
