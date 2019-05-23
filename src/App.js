@@ -126,10 +126,10 @@ class App extends Component {
           if (total_issues > 1) {
             for (i=2; i<=total_issues; i++) {
               //api call for remaining results
-              fetch('https://api.github.com/search/issues?q=repo:'+str[2]+'+type:issue+state:open&per_page=100&page='+i)
+              fetch('https://api.github.com/repos/'+str[2]+'/issues?access_token=5e93daf1d042c2cea4df2ac7cfb58ddae9547bec&state=open&per_page=100&page='+i)
                 .then(result => result.json())
                 .then(results => {
-                  results.items.forEach((item) => {
+                  results.forEach((item) => {
                     item_time = (new Date(item.created_at)).getTime() / 1000;
                     diff = Math.abs(curr_time - item_time);
                     diff_in_hrs = diff/3600;
@@ -198,7 +198,7 @@ class App extends Component {
               variant="outlined"
             />
             </form>
-            <div className={classes.header}><b>No Of Open Issues</b></div>
+            <div className={classes.header}><b>No Of Open Issues Including Pull Requests</b></div>
           </Grid>
         </Grid>
         <div className={classes.error}>{this.state.error}</div>
