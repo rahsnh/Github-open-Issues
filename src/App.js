@@ -164,7 +164,6 @@ class App extends Component {
 
     return (
       <div className={classes.root}>
-        {//Topbar}
         <AppBar position="static">
           <Toolbar className={classes.toolbar} variant="dense">
             <Typography variant="h4" color="inherit" className={classes.grow}>
