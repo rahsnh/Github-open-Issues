@@ -188,7 +188,7 @@ class App extends Component {
               variant="outlined"
             />
             </form>
-            <div className={classes.header}><b>No Of Open Issues Including Pull Requests</b></div>
+            <div className={classes.header}><b>No Of Open Issues</b></div>
           </Grid>
         </Grid>
         <div className={classes.error}>{this.state.error}</div>
