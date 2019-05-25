@@ -112,7 +112,7 @@ class App extends Component {
           if (total_issues > 0) {
             for (i=1; i<=total_issues; i++) {
               //api call for remaining results
-              fetch('https://api.github.com/repos/'+str[2]+'/issues?access_token=88775742bad63184e1c37a412f78a5d132c2e3a5&state=open&per_page=100&page='+i)
+              fetch('https://api.github.com/repos/'+str[2]+'/issues?access_token='personal-access-token'&state=open&per_page=100&page='+i)
                 .then(result => result.json())
                 .then(results => {
                   results.forEach((item) => {
