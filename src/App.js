@@ -80,7 +80,7 @@ class App extends Component {
       last7days: 0, //Counter to count No of issues Within last 7 days
       before7days: 0, //Counter to count No of issues before 7 days
       data: [], //The retrieved JSON data from the Github Api
-      ctr: 1,
+      ctr: 0,
       display: false, //State variable to toggle the table
       isLoading: false, //State variable to toggle Circular PRogress Bar
       error: '' //State variable to toggle erroe
@@ -96,50 +96,38 @@ class App extends Component {
   handleSubmit(event) {
     var curr_date = new Date(); //Get current date
     var curr_time = curr_date.getTime() / 1000; //Get current Time
-    var item_time, diff, diff_in_hrs, diff_in_days, total_issues, i; //Temmp Cariables
+    var item_time, diff, diff_in_hrs, diff_in_days, i; //Temmp Cariables
+    var total_issues = 0;
     var str = (this.state.value).match(/(https:\/\/github.com\/)(.*\/.*)/i); //To check whether the URL is valid
-    this.setState({isLoading: true, display: false, today: 0, last7days: 0, before7days: 0, error: ''});
+    this.setState({isLoading: true, display: false, today: 0, last7days: 0, before7days: 0, error: '', ctr: 0});
     if (str != null) {
       // Fetch the github api for the repository
-      fetch('https://api.github.com/search/issues?q=repo:'+str[2]+'+type:issue+state:open&per_page=100')
+      fetch('https://api.github.com/search/issues?q=repo:'+str[2]+'+state:open')
       .then(res => res.json())
       .then(response => {
         if (!response.message) {
-          total_issues = Math.ceil(response.total_count/100);
-          response.items.forEach((item) => {
-            item_time = (new Date(item.created_at)).getTime() / 1000;
-            diff = Math.abs(curr_time - item_time);
-            diff_in_hrs = diff/3600;
-            diff_in_days = Math.round(diff_in_hrs/24);
-            if (diff_in_days === 0) //to Check if the difference is within 24hrs
-              this.setState({today: this.state.today+1})
-            else if (diff_in_days <= 7) //to Check if the difference is within 7 days
-              this.setState({last7days: this.state.last7days+1})
-            else //to Check if the difference is before 7 days
-              this.setState({before7days: this.state.before7days+1})
-            if (total_issues === 1) {
-              this.setState({display: true, isLoading: false});
-              this.setState({data: [{today: this.state.today, last7days: this.state.last7days, before7days: this.state.before7days}]});
-            }
-          })
+          if (response.total_count)
+            total_issues = Math.ceil(response.total_count/100);
           //Since Github api can return a maximum of 100 results in one time, we have to again call api for the total no of issues
-          if (total_issues > 1) {
-            for (i=2; i<=total_issues; i++) {
+          if (total_issues > 0) {
+            for (i=1; i<=total_issues; i++) {
               //api call for remaining results
-              fetch('https://api.github.com/repos/'+str[2]+'/issues?access_token='token'&state=open&per_page=100&page='+i)
+              fetch('https://api.github.com/repos/'+str[2]+'/issues?access_token=88775742bad63184e1c37a412f78a5d132c2e3a5&state=open&per_page=100&page='+i)
                 .then(result => result.json())
                 .then(results => {
                   results.forEach((item) => {
-                    item_time = (new Date(item.created_at)).getTime() / 1000;
-                    diff = Math.abs(curr_time - item_time);
-                    diff_in_hrs = diff/3600;
-                    diff_in_days = Math.round(diff_in_hrs/24);
-                    if (diff_in_days === 0) 
-                      this.setState({today: this.state.today+1})
-                    else if (diff_in_days <= 7)
-                      this.setState({last7days: this.state.last7days+1})
-                    else
-                      this.setState({before7days: this.state.before7days+1}) 
+                    if (!item.pull_request) {
+                      item_time = (new Date(item.created_at)).getTime() / 1000;
+                      diff = Math.abs(curr_time - item_time);
+                      diff_in_hrs = diff/3600;
+                      diff_in_days = Math.round(diff_in_hrs/24);
+                      if (diff_in_days === 0) 
+                        this.setState({today: this.state.today+1})
+                      else if (diff_in_days <= 7)
+                        this.setState({last7days: this.state.last7days+1})
+                      else
+                        this.setState({before7days: this.state.before7days+1})
+                    }
                   })
                   this.setState({ctr: this.state.ctr+1});
                   if (this.state.ctr === total_issues) {
@@ -148,6 +136,8 @@ class App extends Component {
                   }
                 })
             }
+          } else {
+            this.setState({isLoading: false, error: 'There are no open issues'})
           }
         } else {
           this.setState({isLoading: false, error: 'Invalid Github Repository'});
